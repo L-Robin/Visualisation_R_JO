@@ -1,0 +1,111 @@
+---
+title: "Untitled"
+author: "GUILLAUME Florian et ROBIN Lucas"
+date: "05/03/2021"
+output:
+  prettydoc::html_pretty:
+    df_print: default
+    highlight: vignette
+    number_sections: yes
+    theme: cayman
+    toc: yes
+    toc_depth: '4'
+  pdf_document:
+    df_print: default
+    number_sections: yes
+    toc: yes
+    toc_depth: '4'
+lang: fr
+header-includes:
+- \usepackage{fancyhdr}
+- \pagestyle{fancy}
+- \fancyhead[C]{}
+- \fancyhead[L]{Visu}
+- \fancyfoot[C]{}
+- \fancyfoot[L]{Florian Guillaume & Lucas Robin}
+- \fancyfoot[R]{Page \thepage}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Introduction 
+Nous allons vous présenter notre projet de visualisation de données portant sur les Jeux olympiques. Les jeux olympiques (aussi appelés JO) sont un événement sportif reconnue à l'international où les meilleurs sportifs se réunissent pour s'affronter dans leur discipline. Dans notre dossier nous ne nous intéresserons qu’aux JO modernes, qui ont débutés en 1896 et nous laisserons les jeux olympiques antiques de côté.
+Pour réaliser notre projet, nous avons utilisé une base de données issue du site Kaggle se nommant "Jeux Olympique de 1896 à 2016". Dans cette base de données nous retrouvons en ligne les athlètes avec leurs caractéristiques physiologiques : âge, poids et taille, ainsi que leur pays, l'année des jeux et leur sport / épreuve les concernant.  Ainsi notre base de donnée nous offre 3 variables quantitative et plusieurs qualitatives.
+
+Comment ressortir au mieux les caractéristiques de nos athlètes et de leurs délégations à travers 120 ans de Jeux Olympiques ? Comment représenter les JO de façon épurée et accessible ?
+
+Pour ce faire nous avons découpé notre Application shiny en plusieurs parties que nous allons vous présenter ici.
+
+# Onglet JO, présentation générale
+Dans cette partie nous voulions faire des présentations et des graphes simples sur chaque édition des jeux olympiques.
+
+## Participants 
+Dans cette première sous-partie, nous montrons l'évolution du nombre de participant au cours des JO avec une courbe simple. Ainsi nous pouvons voir que les JO d'hiver ont commencé beaucoup plus tard que les JO d'été et que le nombre de d'athlètes n'est clairement pas comparable. Ceci s’explique en grande partie par le nombre de délégations participants aux jeux olympiques d’hiver qui est nettement plus petit que celui en été (par exemple les pays d’Afrique et d’Amérique centrale ne participent pas).
+ De plus on peut voir des diminutions du nombre de participant sur plusieurs dates qui correspondent à certains boycotts comme pendant la guerre froide (voir la vidéo du monde sur la page d’accueil de notre application). De plus nous avons voulu représenter de quel pays sont originaires les athlètes et en quelle proportion chaque pays est représenté entre les années et les différentes saisons des JO (été ou hiver).
+Grâce à l’histogramme du nombre de participants, on constate que les jeux olympiques d’hiver et d’été sont en décalé depuis 1994 alors qu’avant toutes les épreuves avaient lieux la même année.
+
+Dans cette partie nous avons utilisé les packages ggplot avec plotly et nous avons réalisé une carte avec sf.
+
+## Villes
+Dans cette partie nous représentons les villes qui ont accueilli les JO sur une carte. Pour ce faire on a créé un document où on a enregistré les coordonnées de nos villes grâce à la fonction mygeocode du cours. On a aussi rajouté pour chaque ville sa saison (été ou hiver) et son année afin de faire des bulles pop-up. En effet sur la carte on a mis un logo rouge pour les JO d'été et bleu pour l'hiver avec un pop-up qui affiche la ville, les années et la position. Ainsi sur cette carte on peut voir que les JO sont principalement effectués en Europe ou en Amérique du Nord et dans des villes très développées. 
+Pour cette carte, nous avons utilisé les package leafleft et DT pour la table.
+
+## Sports
+Dans cet onglet nous avons représenté la proportion d’athlètes dans chaque sport pour chaque JO. A cause du grand nombre de sports nous n’avons pas fait un camembert, nous avons alors pensé à faire un treemap issue du package treemapify mais compatible avec ggplot qui nous permet de voir un grand nombre de sports en un seul graphe. Néanmoins, nous n’avons pas réussi à le rendre interactif avec plotly.
+De plus nous avons ajouté une table qui correspond au sport qui ne sont plus réalisés aux JO, pour que l'utilisateur sache quels sports ne sont plus d'actualité tout en rappelant le folklore du début.
+
+
+# Onglet Athlète, les caractéristiques pour chaque sportif
+Ici notre objectif est d'utiliser nos 3 variables quantitatives, qui sont l’âge, le poids et la taille. Nous allons les illustrer en fonction des sports des athlètes mais également des pays.
+
+## Par sport
+### 1er onglet : poids en fonction de la taille
+Dans ce graphique en nuage de points, nous montrons la taille et le poids moyen des athlètes par sport avec un diamètre du point plus ou moins grand en fonction du nombre d'athlètes dans la discipline. Ainsi nous pouvons remarquer en comparant plusieurs sports ceux où les athlètes sont relativement petits et légers comme la gymnastique, ou encore des disciplines comme l'athlétisme qui regroupe un grand nombre de sportifs se retrouvant dans la moyenne. Ensuite, nous pouvons mettre des filtres comme par exemple sur le sexe, les années, les médailles et bien sur les sports que l'on veut voir. Le but a été de discriminer les sports par les variables quantitatives, on aurait pu effectuer une ACP pour la globalité mais pour si peu de variables quantitatives (et très corrélées entre elles) on peut sortir des résultats pertinents facilement en regardant les simplement les moyennes comme on vient de faire.
+
+### 2ème onglet : l’âge de nos athlètes
+Dans le même esprit, il nous reste à monter les différences d’âge en fonction des sports. Pour ce faire, nous avons réalisé deux graphes dont l'un représente la densité et l'autre la répartition sous forme d'un boxplot. Ainsi on peut voir que toutes les disciplines ne sont pas représentées par des athlètes aussi âgés, on retiendra par exemple les gymnastes qui sont assez jeunes par rapport au reste des sportifs.
+
+### 3ème onglet : évolution
+Ici nous avons repris le graphe du premier onglet sur la taille et le poids des athlètes (le nuage de points). Nous l’avons modifié pour obtenir un graphe dynamique montrant l'évolution que ce soit en terme de nombre sportif mais aussi de poids et taille. Dans cette partie nous avons distingué les sport d'été et d'hiver puisque qu'il ne se déroule pas forcement sur la même année et qu’il est dérangeant qu’ils disparaissent tous les 4 ans (quand c’est l’autre saison). D’autre part, cette distinction évite de surcharger nos graphiques.
+
+## Par pays
+### 1er onglet : distribution
+Dans cette partie nous regardons la caractéristique de nos sportifs en fonction de leur pays. Nous avons fait un graphe avec les densités de la variable choisie pour les athlètes de chaque pays sélectionné avec d’autres options filtrantes (sexe, médaille, période). Nous avons également rajouté une courbe General qui représente l'ensemble de nos sportifs dans n'importe quelles disciplines.
+
+### 2ème onglet : histogramme 
+ICI nous avons voulue représenter d'une autre façon nos résultats en passant par des histogrammes en fonction de nos pays mais également avec un histogramme général.
+
+
+# Carte 
+Dans cet onglet nous voulions voir les pays qui ont le plus de médailles. Pour ce faire nous avons repris la base de données world du cours pour récupérer tous les polygones de nos pays mais nous avons dû préalablement effectuer une mise à jour de nos NOC (identifiants des pays à 3 lettres) des pays puisque qu'ils ne correspondaient pas à la bonne époque. Ainsi une fois cela fait nous avons fait une jointure de nos tables pour avoir les valeurs de notre base de données et les polygones pour chaque pays. On peut voir que les pays les plus développés mais aussi ceux qui sont les plus peuplés sont ceux qui ont plus de médaillés (ça paraît logique de par l’investissement dans le sport et la formation des sportifs).
+
+
+# Médailles
+
+## Pays
+A partir d’ici on ne se concentre que sur un seul pays choisi par l’utilisateur. L’objectif est de montrer en fonction du sexe, de la période ou de la valeur des médailles (or, argent, bronze), le nombre de médailles gagnées par ce pays. On les représente notamment via un diagramme camembert avec le top 10 des sports où le pays est le plus performant (on peut changer le top).
+Néanmoins il faut souligner un bémol assez important dans cet onglet. En effet, on compte ici le nombre de médailles mais du coup les sports collectifs sont très mis en avant puisque chaque athlète de l’équipe gagne une médaille. Ainsi à chaque édition il y a 23 médailles d’or distribuées pour une seule équipe de foot alors qu’en réalité il ne s’agit que d’une seule discipline.
+En dessous de notre camembert, nous avons une table pour avoir le détail des médailles de façon plus lisible pour les sports de plus petites envergures.
+
+## Versus
+Dans cette partie nous allons comparer des pays 2 à 2 pour observer les temps forts de chacun dans le temps.
+
+### 1er onglet : General (tous les sports en même temps)
+Dans cet onglet nous avons réalisé 2 graphes : un sous forme de courbe et l’autre sous forme de barplot. Le premier graphe représente le nombre de médailles selon les années pour montrer les évolutions entre nos 2 pays. Le deuxième graphique est un peu plus complexe, il représente sous forme de barplot la proportion de médailles gagnées par rapport au nombre d’athlètes participants à l’édition des JO en question. Cela permet de remettre en perspective les plus gros pays qui gagne beaucoup mais envoient beaucoup plus de sportif, maximisant ainsi leurs chances.
+Dans cette partie, nous étudions tous les sports en même temps et donc la partie de gauche nommée « onglet Sport » ne marche pas mais c’est normal, elle marche juste autre part mais nous y venons maintenant. Par contre la rubrique saison marche très bien ici mais ne fonctionnera plus dans l’autre onglet.
+
+### 2ème onglet : Sport
+Cette fois ci on va comparer nos 2 pays dans une discipline bien précise. Pour chacun on va avoir le nombre de médailles obtenues dans le sport étudié avec le détail du sexe.
+Dans cette partie, le choix de la saison ne marche pas puisque logiquement quand on choisit un sport, on choisit la saison qui va avec.
+Lorsqu’un de nos pays n’a obtenu aucune médaille dans le sport, il disparait du graphique et lorsqu’aucun de nos pays n’a de médaille alors le diagramme en barre n’affiche rien.
+
+
+# Données brutes
+C’est la partie où nos données apparaissent avant qu’on y ai touché, c’est une fenêtre sur notre point de départ, sur une liste de plus de 135 000 sportifs. A côté de ce tableau géant nous avons une partie summary qui détaille toutes nos variables une à une en faisant un bref résumé pour chacune d’entre elles.
+
+
+Voilà, on espère que notre projet vous aura plus. En tout cas nous on a pris beaucoup de plaisir à le réaliser.
+
